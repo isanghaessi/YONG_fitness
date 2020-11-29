@@ -7,13 +7,15 @@
     <center>
         <h1>YONG Fitness</h1>
         
-        <form action="http://localhost:5000/signin" accept-charset="utf-8" name="IdPw" method="get">
-            <legend>input administrator ID/PW</legend>
+        <form action="/signin_add" accept-charset="utf-8" method="get">
+            <legend>add administrator</legend>
             ID: <input type="text" name="Id"/><br>
             PW: <input type="text" name="Pw"/><br>
-            TYPE: <input type="text" name="type"/><br>
-            <input type="submit" name="signin" value="sign-in"/>
+            TYPE: <input type="text" name="type"/><br><br>
+            MASTER PW: <input type="text" name="MASTER_PW"/><br>
+            <input type="submit" value="add"/>
         </form>
+        <br><h2><%-data%></h2>
     </center>
 </body>
 </html>
