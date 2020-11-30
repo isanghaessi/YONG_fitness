@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <form action="/logout" accept-charset="utf-8" method="get">
+        <input type="submit" value="log-out"/>
+    </form>
+    <center>
+        <h1>YONG Fitness</h1><br>
+        <h2><%-warn%></h2>
+        <form action="/search" accept-charset="utf-8" method="get">
+            <input type="text" name="input"/>
+            <input type="submit" value="search"/>
+        </form>
+        <style>
+            .head { font-weight: bolder; }
+            .body { font-weight: normal; }
+            table, th, td { border: 1px solid #bcbcbc; }
+        </style>
+        members<br>
+        <form action="/to_trainer" accept_charset="utf-8" method="get">
+            <input type="submit" value="trainers"/>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th class='head'>delete</th>
+                    <th class='head'>mid</th>
+                    <th class='head'>name</th>
+                    <th class='head'>birth date</th>
+                    <th class='head'>type</th>
+                    <th class='head'>start date</th>
+                    <th class='head'>end date</th>
+                    <th class='head'>trainer</th>
+                    <th class='head'>modify</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i=0; i<data.length; i++) { %>
+                <tr>
+                    <form action="/member_delete" accept_charset="utf-8" method="get">
+                        <th>
+                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>"/>
+                        </th>
+                    </form>
+                    <form action="/member_modify" accept-charset="utf-8" method="get">
+                        <th class='body'><%-data[i].mId%></th>
+                        <th class='body'><%-data[i].name%></th>
+                        <th class='body'><input type="date" name="birthDate" value='<%-mFormat(data[i].birthDate)%>'/></th>
+                        <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>"/></th>
+                        <th class='body'><input type="date" name="startDate" value='<%-mFormat(data[i].startDate)%>'/></th>
+                        <th class='body'><input type="date" name="endDate" value='<%-mFormat(data[i].endDate)%>'/></th>
+                        <th class='body'><input tupe="text" name="trainer" value="<%-data[i].trainer%>"/></th>
+                        <th>
+                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>"/>
+                        </th>
+                    </form>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </center>
+</body>
+</html>
