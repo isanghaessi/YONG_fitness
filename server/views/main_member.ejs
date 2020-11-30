@@ -10,9 +10,9 @@
     <center>
         <h1>YONG Fitness</h1><br>
         <h2><%-warn%></h2>
-        <form action="/search" accept-charset="utf-8" method="get">
+        <form action="/search_member" accept-charset="utf-8" method="get">
             <input type="text" name="input"/>
-            <input type="submit" value="search"/>
+            <input type="submit" value="search member"/>
         </form>
         <style>
             .head { font-weight: bolder; }
@@ -20,8 +20,8 @@
             table, th, td { border: 1px solid #bcbcbc; }
         </style>
         members<br>
-        <form action="/to_trainer" accept_charset="utf-8" method="get">
-            <input type="submit" value="trainers"/>
+        <form style={font-weight:bolder;} action="/to trainer" accept_charset="utf-8" method="get">
+            <input style={font-weight:bolder;} type="submit" value="trainers"/>
         </form>
         <table>
             <thead>

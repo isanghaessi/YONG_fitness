@@ -5,12 +5,12 @@
 </head>
 <body>
     <form action="/logout" accept-charset="utf-8" name="logout" method="get">
-        <input type="submit" value="logout"/>
+        <input type="submit" value="log-out"/>
     </form>
     <form action="/member_new" accept-charset="utf-8" name="modify" method="get">
         <center>
             <h1>YONG Fitness</h1>
-            name: <%-data[0].name%><br>
+            name: <input type="text" name="name"/><br>
             birth date: <input type="date" name="birthDate"/><br>
             type: <input type="text" name="type"/><br>
             start date: <input type="date" name="startDate"/><br>
