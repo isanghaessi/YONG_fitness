@@ -1,26 +1,38 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
 </head>
+
 <body>
     <form action="/logout" accept-charset="utf-8" method="get">
-        <input type="submit" value="log-out"/>
+        <input type="submit" value="log-out" />
     </form>
     <center>
         <h1>YONG Fitness</h1><br>
         <h2><%-warn%></h2>
         <form action="/search_trainer" accept-charset="utf-8" method="get">
-            <input type="text" name="input"/>
-            <input type="submit" value="search trainer"/>
+            <input type="text" name="input" />
+            <input type="submit" value="search trainer" />
         </form>
         <style>
-            .head { font-weight: bolder; }
-            .body { font-weight: normal; }
-            table, th, td { border: 1px solid #bcbcbc; }
+            .head {
+                font-weight: bolder;
+            }
+
+            .body {
+                font-weight: normal;
+            }
+
+            table,
+            th,
+            td {
+                border: 1px solid #bcbcbc;
+            }
         </style>
-        <form style={font-weight:bolder;} action="/to member" accept_charset="utf-8" method="get">
-            <input style={font-weight:bolder;} type="submit" value="members"/>
+        <form style={font-weight:bolder;} action="/to_member" accept_charset="utf-8" method="get">
+            <input style={font-weight:bolder;} type="submit" value="members" />
         </form>
         trainers<br>
         <table>
@@ -31,6 +43,7 @@
                     <th class='head'>name</th>
                     <th class='head'>type</th>
                     <th class='head'>member</th>
+                    <th class='head'>modify</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,22 +51,26 @@
                 <tr>
                     <form action="/trainer_delete" accept_charset="utf-8" method="get">
                         <th>
-                            <input style="color:#00000000;" type="submit" name="tId" value="<%-data[i].tId%>"/>
+                            <input style="color:#00000000;" type="submit" name="tId" value="<%-data[i].tId%>" />
                         </th>
                     </form>
                     <form action="/trainer_modify" accept-charset="utf-8" method="get">
                         <th class='body'><%-data[i].tId%></th>
                         <th class='body'><%-data[i].name%></th>
-                        <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>"/></th>
-                        <th class='body'><input tupe="text" name="member" value="<%-data[i].mem%>"/></th>
+                        <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>" /></th>
+                        <th class='body'><input tupe="text" name="member" value="<%-data[i].mem%>" /></th>
                         <th>
-                            <input style="color:#00000000;" type="submit" name="tId" value="<%-data[i].tId%>"/>
+                            <input style="color:#00000000;" type="submit" name="tId" value="<%-data[i].tId%>" />
                         </th>
                     </form>
                 </tr>
                 <% } %>
             </tbody>
         </table>
+        <form action="/new_trainer_ent" accept-charset="utf-8" method="get">
+            <input type="submit" value="add trainer" />
+        </form>
     </center>
 </body>
+
 </html>

@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
 </head>
+
 <body>
     <form action="/logout" accept-charset="utf-8" method="get">
-        <input type="submit" value="log-out"/>
+        <input type="submit" value="log-out" />
     </form>
     <center>
         <h1>YONG Fitness</h1><br>
         <h2><%-warn%></h2>
         <form action="/search_member" accept-charset="utf-8" method="get">
-            <input type="text" name="input"/>
-            <input type="submit" value="search member"/>
+            <input type="text" name="input" />
+            <input type="submit" value="search member" />
         </form>
         <style>
-            .head { font-weight: bolder; }
-            .body { font-weight: normal; }
-            table, th, td { border: 1px solid #bcbcbc; }
+            .head {
+                font-weight: bolder;
+            }
+
+            .body {
+                font-weight: normal;
+            }
+
+            table,
+            th,
+            td {
+                border: 1px solid #bcbcbc;
+            }
         </style>
         members<br>
-        <form style={font-weight:bolder;} action="/to trainer" accept_charset="utf-8" method="get">
-            <input style={font-weight:bolder;} type="submit" value="trainers"/>
+        <form style={font-weight:bolder;} action="/to_trainer" accept_charset="utf-8" method="get">
+            <input style={font-weight:bolder;} type="submit" value="trainers" />
         </form>
         <table>
             <thead>
@@ -38,29 +50,33 @@
                 </tr>
             </thead>
             <tbody>
-                <% for(let i=0; i<data.length; i++) { %>
+                <% for(let i=1; i<data.length; i++) { %>
                 <tr>
                     <form action="/member_delete" accept_charset="utf-8" method="get">
                         <th>
-                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>"/>
+                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>" />
                         </th>
                     </form>
                     <form action="/member_modify" accept-charset="utf-8" method="get">
                         <th class='body'><%-data[i].mId%></th>
                         <th class='body'><%-data[i].name%></th>
-                        <th class='body'><input type="date" name="birthDate" value='<%-mFormat(data[i].birthDate)%>'/></th>
-                        <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>"/></th>
-                        <th class='body'><input type="date" name="startDate" value='<%-mFormat(data[i].startDate)%>'/></th>
-                        <th class='body'><input type="date" name="endDate" value='<%-mFormat(data[i].endDate)%>'/></th>
-                        <th class='body'><input tupe="text" name="trainer" value="<%-data[i].trainer%>"/></th>
+                        <th class='body'><input type="date" name="birthDate" value='<%-mFormat(data[i].birthDate)%>' /></th>
+                        <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>" /></th>
+                        <th class='body'><input type="date" name="startDate" value='<%-mFormat(data[i].startDate)%>' /></th>
+                        <th class='body'><input type="date" name="endDate" value='<%-mFormat(data[i].endDate)%>' /></th>
+                        <th class='body'><input tupe="text" name="trainer" value="<%-data[i].trainer%>" /></th>
                         <th>
-                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>"/>
+                            <input style="color:#00000000;" type="submit" name="mId" value="<%-data[i].mId%>" />
                         </th>
                     </form>
                 </tr>
                 <% } %>
             </tbody>
         </table>
+        <form action="/new_member_ent" accept-charset="utf-8" method="get">
+            <input type="submit" value="add member" />
+        </form>
     </center>
 </body>
+
 </html>

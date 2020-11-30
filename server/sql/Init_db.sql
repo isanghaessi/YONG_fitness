@@ -30,7 +30,7 @@ create table Trainer(
     tId int not null,
     type text,
     mId int,
-    foreign key(mId) references Member(mId),
+    foreign key(mId) references Member(mId) on delete cascade on update no action,
     primary key (tId, mId)
 );
 
@@ -43,6 +43,7 @@ insert into Master values ('0000');
 
 insert into Administrator values('yong', '0000', 'boss');
 
+insert into Member values(null,0,null,null,null,null);
 insert into Member values('Alfred', 1, '1996-12-31', 'All', '2020-11-29', '2021-11-29');
 insert into Member values('Son', 2, '1994-03-28', 'Weight', '2020-10-15', '2021-01-15');
 insert into Member values('Son', 3, '1986-01-22', 'Swim', '2020-03-01', '2021-03-01');

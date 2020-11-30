@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
 </head>
+
 <body>
     <form action="/logout" accept-charset="utf-8" name="logout" method="get">
-        <input type="submit" value="log-out"/>
+        <input type="submit" value="log-out" />
     </form>
-    <form action="/member_new" accept-charset="utf-8" name="modify" method="get">
+    <form action="/new_trainer" accept-charset="utf-8" name="modify" method="get">
         <center>
             <h1>YONG Fitness</h1>
-            name: <input type="text" name="name"/><br>
-            type: <input type="text" name="type"/><br>
-            member: <input type="text" name="member"/><br>
-            <input type="submit" value="add"/>
+            name: <input type="text" name="name" /><br>
+            type: <input type="text" name="type" /><br>
+            member: <input type="text" name="member" disabled /><br>
+            <input type="submit" value="add" />
         </center>
     </form>
     <h2><%-warn%></h2>
 </body>
+
 </html>
