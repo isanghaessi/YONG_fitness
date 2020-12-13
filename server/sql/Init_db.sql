@@ -1,3 +1,5 @@
+use YONG_fitness;
+
 drop table if exists Trainer;
 drop table if exists Member;
 drop table if exists Administrator;
@@ -30,7 +32,7 @@ create table Trainer(
     tId int not null,
     type text,
     mId int,
-    foreign key(mId) references Member(mId) on delete cascade on update no action,
+    foreign key(mId) references Member(mId) on delete cascade,
     primary key (tId, mId)
 );
 
@@ -54,3 +56,7 @@ insert into Trainer values('Mike', 1, 'Weight', 2);
 insert into Trainer values('Mike', 1, 'Squash', 4);
 insert into Trainer values('Susan', 2, 'Swim', 3);
 insert into Trainer values('Sam', 3, 'Squash', 1);
+insert into Trainer values('Mayweather', 4, 'Boxing', 0);
+insert into Trainer values('Mike', 1, 'Weight', 0);
+insert into Trainer values('Susan', 2, 'Swim', 0);
+insert into Trainer values('Sam', 3, 'Squash', 0);

@@ -152,18 +152,65 @@ router.get('/member_modify', function (req, res, next) {
     var startDate = req.param("startDate");
     var endDate = req.param("endDate");
     var trainer = req.param("trainer");
+    var tId;
+    var ttype;
     //멤버 새로운 정보 업데이트
     pool.query('update Member set type=?, startDate=?, endDate=? where ?=mId', [type, startDate, endDate, mId], function (err, results) {
         if (err) throw err;
-        pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+        pool.query('select tId, type from Trainer where ?=name', [trainer], function (err, results) {
             if (err) throw err;
-            res.locals.mFormat = function (date) {
-                return moment(date).format('yyyy-MM-DD')
-            };
-            res.render('main_member', {
-                data: results,
-                warn: 'member modified'
-            });
+            //입력한 트레이너가 존재함
+            if (results.length > 0) {
+                tId = results[0].tId;
+                ttype = results[0].type;
+                pool.query('delete from Trainer where ?=mId and ?=name', [mId, trainer], function (err, results) {
+                    if (err) throw err;
+                    pool.query('insert into Trainer values(?, ?, ?, ?)', [trainer, tId, type, mId], function (err, reuslts) {
+                        //업데이트 완류후 -> 새로고침
+                        pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+                            if (err) throw err;
+                            res.locals.mFormat = function (date) {
+                                return moment(date).format('yyyy-MM-DD')
+                            };
+                            res.render('main_member', {
+                                data: results,
+                                warn: 'member modified'
+                            });
+                        });
+                    });
+                });
+                //입력한 트레이너가 존재하지 않음
+            } else {
+                //빈칸이므로 트레이너를 공석
+                if (trainer == '') {
+                    pool.query('delete from Trainer where ?=mId and ?=name', [mId, trainer], function(err, results){
+                        if (err) throw err;
+                        //업데이트 완류후 -> 새로고침
+                        pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+                            if (err) throw err;
+                            res.locals.mFormat = function (date) {
+                                return moment(date).format('yyyy-MM-DD')
+                            };
+                            res.render('main_member', {
+                                data: results,
+                                warn: 'member modified'
+                            });
+                        });
+                    });
+                    //존재하지 않는다고 warn
+                } else {
+                    pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+                        if (err) throw err;
+                        res.locals.mFormat = function (date) {
+                            return moment(date).format('yyyy-MM-DD')
+                        };
+                        res.render('main_member', {
+                            data: results,
+                            warn: 'trainer doesn\'t exist'
+                        });
+                    });
+                }
+            }
         });
     });
 });
@@ -202,32 +249,32 @@ router.get('/new_member', function (req, res, next) {
     var startDate = req.param('startDate');
     var endDate = req.param('endDate');
     //필요 정보를 넣어주라고 warn
-    if (name == null || type == null || startDate == null || endDate == null) {
+    if (name == '' || type == '' || startDate == '' || endDate == '') {
         res.render('new_member', {
-            data: results,
             warn: 'input correctly'
         });
-    }
-    //mId 계산해서 멤버 등록
-    var mId;
-    pool.query('select max(mId) max from Member', function (err, results) {
-        if (err) throw err;
-        mId = results[0].max + 1;
-        pool.query('insert into Member values (?, ?, ?, ?, ?, ?)', [name, mId, birthDate, type, startDate, endDate], function (err, results) {
+        //mId 계산해서 멤버 등록
+    } else {
+        var mId;
+        pool.query('select max(mId) max from Member', function (err, results) {
             if (err) throw err;
-            //등록 완료 된후 -> 메인 페이지
-            pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+            mId = results[0].max + 1;
+            pool.query('insert into Member values (?, ?, ?, ?, ?, ?)', [name, mId, birthDate, type, startDate, endDate], function (err, results) {
                 if (err) throw err;
-                res.locals.mFormat = function (date) {
-                    return moment(date).format('yyyy-MM-DD')
-                };
-                res.render('main_member', {
-                    data: results,
-                    warn: 'member added'
+                //등록 완료 된후 -> 메인 페이지
+                pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+                    if (err) throw err;
+                    res.locals.mFormat = function (date) {
+                        return moment(date).format('yyyy-MM-DD')
+                    };
+                    res.render('main_member', {
+                        data: results,
+                        warn: 'member added'
+                    });
                 });
             });
         });
-    });
+    }
 });
 
 //------------------------------------------------------------------------------------------트레이너------------------------------------------------------------------------------------------
@@ -321,27 +368,27 @@ router.get('/new_trainer', function (req, res, next) {
     var member = req.param('member');
     //필요 정보를 넣어주라고 warn
     if (name == '' || type == '') {
-        res.render('new_trainer_ent', {
-            data: results,
+        res.render('new_trainer', {
             warn: 'input correctly'
         });
-    }
-    //tId 계산해서 트레이너 등록
-    var tId;
-    pool.query('select max(tId) max from Trainer', function (err, results) {
-        if (err) throw err;
-        tId = results[0].max + 1;
-        pool.query('insert into Trainer values (?, ?, ?, ?)', [name, tId, type, 0], function (err, results) {
+        //tId 계산해서 트레이너 등록
+    } else {
+        var tId;
+        pool.query('select max(tId) max from Trainer', function (err, results) {
             if (err) throw err;
-            //등록후 -> 새로고침
-            pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
-                res.render('main_trainer', {
-                    data: results,
-                    warn: 'trainer added'
+            tId = results[0].max + 1;
+            pool.query('insert into Trainer values (?, ?, ?, ?)', [name, tId, type, 0], function (err, results) {
+                if (err) throw err;
+                //등록후 -> 새로고침
+                pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
+                    res.render('main_trainer', {
+                        data: results,
+                        warn: 'trainer added'
+                    });
                 });
             });
         });
-    });
+    }
 });
 
 module.exports = router;

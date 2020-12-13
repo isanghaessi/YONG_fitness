@@ -50,7 +50,8 @@
                 </tr>
             </thead>
             <tbody>
-                <% for(let i=1; i<data.length; i++) { %>
+                <% for(let i=0; i<data.length; i++) { %>
+                <% if (data[i].mId!=0) { %>
                 <tr>
                     <form action="/member_delete" accept_charset="utf-8" method="get">
                         <th>
@@ -70,6 +71,7 @@
                         </th>
                     </form>
                 </tr>
+                <% } %>
                 <% } %>
             </tbody>
         </table>
