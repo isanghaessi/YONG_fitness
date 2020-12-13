@@ -14,7 +14,7 @@
         <h2><%-warn%></h2>
         <form action="/search_trainer" accept-charset="utf-8" method="get">
             <input type="text" name="input" />
-            <input type="submit" value="search trainer" />
+            <input type="submit" value="search" />
         </form>
         <style>
             .head {
@@ -58,7 +58,7 @@
                         <th class='body'><%-data[i].tId%></th>
                         <th class='body'><%-data[i].name%></th>
                         <th class='body'><input tupe="text" name="type" value="<%-data[i].type%>" /></th>
-                        <th class='body'><input tupe="text" name="member" value="<%-data[i].mem%>" /></th>
+                        <th class='body'><input tupe="text" name="member" value="<%-data[i].mem%>" disabled /></th>
                         <th>
                             <input style="color:#00000000;" type="submit" name="tId" value="<%-data[i].tId%>" />
                         </th>

@@ -110,7 +110,7 @@ router.get('/search_member', function (req, res, next) {
     pool.query('select * from (select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer))y where ?=mId or ?=name or ?=type or ?=trainer order by mId', [input, input, input, input], function (err, results) {
         if (err) throw err;
         //검색 결과가 있음
-        if (results.length > 0) {
+        if (results.length > 0 && input!='') {
             res.locals.mFormat = function (date) {
                 return moment(date).format('yyyy-MM-DD')
             };
@@ -231,29 +231,30 @@ router.get('/new_member', function (req, res, next) {
 });
 
 //------------------------------------------------------------------------------------------트레이너------------------------------------------------------------------------------------------
-//메인페이지 search_trainer
+//메인페이지 search_trainer------------------------------
 router.get('/search_trainer', function (req, res, next) {
     var input = req.param('input');
-    pool.query('select * from (select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId)y where ?=name or ?=type or ?=mem order by tId', [input, input, input], function (err, results) {
+    pool.query('select * from (select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId)y where ?=tId or ?=name or ?=type or ?=mem order by tId', [input, input, input, input], function (err, results) {
         if (err) throw err;
         //검색 결과가 있음
-        if (results.length > 0) {
+        if (results.length > 0 && input!='') {
             res.render('main_trainer', {
                 data: results,
                 warn: ''
             })
             //검색 결과가 없음
         } else {
-            pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId or der by tId', function (err, results) {
+            pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
                 res.render('main_trainer', {
                     data: results,
-                    warn: 'no found data'
+                    warn: 'no data match'
                 });
             });
         }
     });
 });
 
+//메인 페이지 to_member------------------------------
 router.get('/to_member', function (req, res, next) {
     pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
         if (err) throw err;
@@ -267,28 +268,31 @@ router.get('/to_member', function (req, res, next) {
     });
 });
 
+//메인 페이지 trainer_modify------------------------------
 router.get('/trainer_modify', function (req, res, next) {
     var tId = req.param("tId");
-    var name = req.param('name');
+    var name;
     var type = req.param("type");
     var member = req.param("member");
     var mId;
-    pool.query('select mId from Trainer where ?=tId', [tId], function (err, results) {
+    pool.query('select mId, name from Trainer where ?=tId', [tId], function (err, results) {
         if (err) throw err;
         if (results.length < 0) throw err;
         mId = results[0].mId;
+        name = results[0].name;
         pool.query('update Trainer set name=?, type=?, mId=? where ?=tId', [name, type, mId, tId], function (err, results) {
             if (err) throw err;
             pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
                 res.render('main_trainer', {
                     data: results,
-                    warn: 'modified'
+                    warn: 'trainer modified'
                 });
             });
         });
     });
 });
 
+//메인 페이지 trainer_delete------------------------------
 router.get('/trainer_delete', function (req, res, next) {
     var tId = req.param("tId");
     console.log(tId);
@@ -297,38 +301,43 @@ router.get('/trainer_delete', function (req, res, next) {
         pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
             res.render('main_trainer', {
                 data: results,
-                warn: 'deleted'
+                warn: 'trainer deleted'
             });
         });
     });
 });
 
+//new_trainer 페이지------------------------------
 router.get('/new_trainer_ent', function (req, res, next) {
     res.render('new_trainer', {
         warn: ''
     });
 });
 
+//new_treainer 등록------------------------------
 router.get('/new_trainer', function (req, res, next) {
     var name = req.param("name");
     var type = req.param('type');
     var member = req.param('member');
+    //필요 정보를 넣어주라고 warn
     if (name == '' || type == '') {
         res.render('new_trainer_ent', {
             data: results,
             warn: 'input correctly'
         });
     }
+    //tId 계산해서 트레이너 등록
     var tId;
     pool.query('select max(tId) max from Trainer', function (err, results) {
         if (err) throw err;
         tId = results[0].max + 1;
         pool.query('insert into Trainer values (?, ?, ?, ?)', [name, tId, type, 0], function (err, results) {
             if (err) throw err;
+            //등록후 -> 새로고침
             pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
                 res.render('main_trainer', {
                     data: results,
-                    warn: 'added'
+                    warn: 'trainer added'
                 });
             });
         });
