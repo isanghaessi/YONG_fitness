@@ -153,20 +153,36 @@ router.get('/member_modify', function (req, res, next) {
     var endDate = req.param("endDate");
     var trainer = req.param("trainer");
     var tId;
-    var ttype;
     //멤버 새로운 정보 업데이트
     pool.query('update Member set type=?, startDate=?, endDate=? where ?=mId', [type, startDate, endDate, mId], function (err, results) {
         if (err) throw err;
-        pool.query('select tId, type from Trainer where ?=name', [trainer], function (err, results) {
+        pool.query('select tId from Trainer where ?=name', [trainer], function (err, results) {
             if (err) throw err;
             //입력한 트레이너가 존재함
             if (results.length > 0) {
-                tId = results[0].tId;
-                ttype = results[0].type;
-                pool.query('delete from Trainer where ?=mId and ?=name', [mId, trainer], function (err, results) {
+                pool.query('select tId from Trainer where ?=name and type like' + pool.escape('%'+type+'%'), [trainer, type], function (err, results) {
                     if (err) throw err;
-                    pool.query('insert into Trainer values(?, ?, ?, ?)', [trainer, tId, type, mId], function (err, reuslts) {
-                        //업데이트 완류후 -> 새로고침
+                    //입력한 트레이너가 type을 가르칠수 있음
+                    if (results.length > 0) {
+                        tId = results[0].tId;
+                        pool.query('delete from Trainer where ?=mId', [mId], function (err, results) {
+                            if (err) throw err;
+                            pool.query('insert into Trainer values(?, ?, ?, ?)', [trainer, tId, type, mId], function (err, reuslts) {
+                                //업데이트 완류후 -> 새로고침
+                                pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
+                                    if (err) throw err;
+                                    res.locals.mFormat = function (date) {
+                                        return moment(date).format('yyyy-MM-DD')
+                                    };
+                                    res.render('main_member', {
+                                        data: results,
+                                        warn: 'member modified'
+                                    });
+                                });
+                            });
+                        });
+                        //입력된 트레이너가 가르칠수 없다고 wran
+                    }else{
                         pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
                             if (err) throw err;
                             res.locals.mFormat = function (date) {
@@ -174,16 +190,16 @@ router.get('/member_modify', function (req, res, next) {
                             };
                             res.render('main_member', {
                                 data: results,
-                                warn: 'member modified'
+                                warn: 'that trainer can\'t teach that type'
                             });
                         });
-                    });
+                    }
                 });
                 //입력한 트레이너가 존재하지 않음
             } else {
                 //빈칸이므로 트레이너를 공석
                 if (trainer == '') {
-                    pool.query('delete from Trainer where ?=mId and ?=name', [mId, trainer], function(err, results){
+                    pool.query('delete from Trainer where ?=mId', [mId], function(err, results){
                         if (err) throw err;
                         //업데이트 완류후 -> 새로고침
                         pool.query('select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, Trainer.name trainer from Member, Trainer where Member.mId=Trainer.mId union select Member.mId, Member.name, birthDate, Member.type, startDate, endDate, null from Member, Trainer where (Member.mId) not in (select mId from Trainer) order by mId', function (err, results) {
@@ -322,12 +338,18 @@ router.get('/trainer_modify', function (req, res, next) {
     var type = req.param("type");
     var member = req.param("member");
     var mId;
-    pool.query('select mId, name from Trainer where ?=tId', [tId], function (err, results) {
-        if (err) throw err;
-        if (results.length < 0) throw err;
-        mId = results[0].mId;
-        name = results[0].name;
-        pool.query('update Trainer set name=?, type=?, mId=? where ?=tId', [name, type, mId, tId], function (err, results) {
+    console.log(member);
+    //trainer와 member간의 데이터 건드릴수 x
+    if(member!=''){
+        pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
+            res.render('main_trainer', {
+                data: results,
+                warn: 'it can\'t be modified'
+            });
+        });
+        //trainer만의 데이터 바꿈
+    } else {
+        pool.query('update Trainer set type=? where ?=tId and 0=mId', [type, tId], function (err, results) {
             if (err) throw err;
             pool.query('select tId, Trainer.name, Trainer.type, Member.name mem from Trainer, Member where Trainer.mId=Member.mId order by tId', function (err, results) {
                 res.render('main_trainer', {
@@ -336,7 +358,7 @@ router.get('/trainer_modify', function (req, res, next) {
                 });
             });
         });
-    });
+    }
 });
 
 //메인 페이지 trainer_delete------------------------------
