@@ -1,4 +1,4 @@
-# YONG_fitness
+# yong_fitness
  - node.js
  - express
  - mysql
